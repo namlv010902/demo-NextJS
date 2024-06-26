@@ -13,12 +13,15 @@ const Header = () => {
   useEffect(() => {
     const getProfile = async () => {
       try {
-        const res = await getMe();
-        login(res.data);
-      } catch (error:any) {
-        console.error("Error fetching user profile:", error.response.data);
+        await getMe().then(({ response }) => {
+          console.log(response);
+          
+          login(response.data);
+        });
+      } catch (error: any) {
+        console.error("Error fetching user profile:", error);
       }
-    };
+    }
     getProfile();
   }, []);
   return (
