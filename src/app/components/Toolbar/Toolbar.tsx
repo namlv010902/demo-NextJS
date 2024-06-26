@@ -1,9 +1,10 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation"
 import InputSearch from '../Form/InputSearch';
 import Select from '../Form/Select';
 import { ColumnsToolbar } from './type';
+import useDebounce from '@/app/hooks/useDebounce';
 interface ToolbarProps {
   createPath?: string;
   createBtnText?: string;
@@ -16,11 +17,16 @@ const Toolbar: React.FC<ToolbarProps> = ({ onSearch, createBtnText = "Add new", 
   const [searchValue, setSearchValue] = useState('');
   const router = useRouter()
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(event.target.value);
-    onSearch?.(event.target.value);
-  };
+  const debouncedSearchValue = useDebounce(searchValue, 500);
 
+    useEffect(() => {
+        onSearch?.(debouncedSearchValue);
+    }, [debouncedSearchValue, onSearch]);
+
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchValue(event.target.value);
+        // onSearch?.(event.target.value);
+    };
   const { type} = columns
   return (
     <div className="flex justify-between items-center border-b border-gray-200 p-4 mb-4">

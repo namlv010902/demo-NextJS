@@ -15,6 +15,11 @@ const config: Config = {
       },
     },
   },
+  variants: {
+    extend: {
+      borderColor: ['focus'],
+    },
+  },
   plugins: [],
 };
 export default config;

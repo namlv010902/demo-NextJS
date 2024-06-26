@@ -2,13 +2,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Menu from "./components/Menu";
-import Footer from "./components/Footer";
-import Header from "./components/Header";
+import Footer from "./components/Footer/Footer";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from "react";
-import { UserProvider } from "./context/useContext";
-
+import { AuthProvider } from "./context/useContext";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Header from "./components/Header/Header";
 const inter = Inter({ subsets: ["latin"] });
 
 
@@ -23,16 +23,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <UserProvider>
+        <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <Header />
             <div style={{ minHeight: "83vh" }}>
               {children}
             </div>
             <Footer />
+            <ToastContainer />
 
           </QueryClientProvider>
-        </UserProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -3,16 +3,11 @@ import Link from 'next/link'
 import React from 'react'
 import { logout } from '../api/auth'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '../context'
 
 const Dropdown = () => {
-    const router = useRouter()
-    const handelLogout = async () => {
-        
-        await logout().then(()=>{
-            alert("log out successfully")
-            router.push("/auth/login")
-        })
-    }
+    const {logout} = useAuth()
+
     return (
 
         <div>
@@ -25,7 +20,7 @@ const Dropdown = () => {
                 <Link href={"/auth/register"}>Register</Link>
 
             </button>
-            <button onClick={handelLogout}>Logout</button>
+            <button className='px-4 py-2 bg-red-400 text-white rounded-sm hover:bg-red-700' onClick={logout}>Logout</button>
 
         </div>
 

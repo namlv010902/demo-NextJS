@@ -11,37 +11,39 @@ import { IFormInputs, schemaProduct } from '@/app/types/products';
 
 
 const EditProductPage = () => {
-  const { register, handleSubmit, formState: { errors },control ,setValue,watch} = useForm<IFormInputs>({
-    defaultValues:{
-     name:"",
-     price:0,
-     image:"",
+  const { handleSubmit, control, setValue, } = useForm<IFormInputs>({
+    defaultValues: {
+      content: "",
+      title: "",
+      image: "",
+      categoryId: undefined,
     },
     resolver: yupResolver(schemaProduct),
   });
-  const {mutate} = useUpdateProduct()
+  const { mutate } = useUpdateProduct()
   const router = useRouter()
-  const {id} = useParams()
-  const {data,status} = useQueryProduct(id as string)
+  const { id } = useParams()
+  const { data, status } = useQueryProduct(id as string)
 
-  useEffect(()=>{
-    if(status=="success"){
-      setValue("name",data?.name)
-      setValue("price",data?.price)
-      setValue("image",data?.image)
-      setValue("id",id as string)
+
+  useEffect(() => {
+    if (status == "success" && data) {
+      const fieldsToSet = ['content', 'title', 'image', 'id', 'categoryId'];
+      fieldsToSet.forEach((field: any) => {
+        setValue(field, data[field]);
+      });
     }
-  },[id, data,status,setValue]) 
-  
+  }, [id, data, status, setValue])
+
   const onSubmit: SubmitHandler<IFormInputs> = data => {
     console.log('Form Data:', data);
-    mutate(data,{
-      onSuccess:()=>{
+    mutate(data, {
+      onSuccess: () => {
         alert("success")
         router.push("/products")
       },
 
-      onError:()=>{
+      onError: () => {
         console.log("error")
       }
     })
@@ -49,13 +51,11 @@ const EditProductPage = () => {
 
   return (
     <div className="max-w-lg mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Edit Product</h1>
-     <ProductForm 
-     control={control}
-     onSubmit={handleSubmit(onSubmit)}
-     errors={errors}
-     register={register}
-     />
+      <h1 className="text-2xl font-bold mb-4 text-center">Edit Product</h1>
+      <ProductForm
+        control={control}
+        onSubmit={handleSubmit(onSubmit)}
+      />
     </div>
   );
 };

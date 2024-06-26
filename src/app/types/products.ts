@@ -1,24 +1,29 @@
 import * as yup from 'yup';
+import { Category } from './category';
 
 export const schemaProduct = yup.object().shape({
   id: yup.string().nullable(),
-  name: yup.string().required('Name is required'),
-  price: yup.number().required('Price is required').integer('Price must be an integer'),
+  title: yup.string().required('Title is required'),
+  content: yup.string().required('Content is required'),
   image: yup.string().required('Image is required'),
+  categoryId: yup.number().required('Category is required')
 });
 
 type Product = {
   id: string;
-  name: string;
-  price: number;
+  title: string;
+  content: string;
   image: string;
+  categoryId:number | undefined
+  category:Category
 }
 
-type IFormInputs ={
-  name: string;
-  price: number;
+type IFormInputs = {
+  title: string;
+  content: string;
   image: string;
   id: string;
+  categoryId:number | undefined 
 }
 
 export type {

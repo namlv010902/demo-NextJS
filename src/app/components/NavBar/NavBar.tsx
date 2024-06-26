@@ -5,7 +5,7 @@ type MenuType = {
   name: string;
   path: string;
 }
-const Menu: React.FC = () => {
+const NavBar: React.FC = () => {
 
   const pathName = usePathname()
 
@@ -18,6 +18,11 @@ const Menu: React.FC = () => {
     {
       name: "Products",
       path: "/products",
+
+    },
+    {
+      name: "Category",
+      path: "/category",
 
     },
     {
@@ -50,4 +55,4 @@ const Menu: React.FC = () => {
   );
 };
 
-export default Menu;
+export default NavBar;

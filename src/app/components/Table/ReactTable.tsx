@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import {
     useReactTable,
     getCoreRowModel,
@@ -9,33 +8,79 @@ import {
     flexRender
 } from '@tanstack/react-table';
 import Pagination from './Pagination';
-
+import { Product } from '@/app/types/products';
+interface TableDataType {
+    data: Product[],
+    meta: {
+        totalPage: number;
+        currentPage: number;
+        perPage: number;
+        totalItems: number;
+    };
+}
 interface TableProps {
-    columns: Column<any>[];
-    data: any[];
+    columns: Column<Product>[];
+    setCurrentPage: (value: number) => void;
+    setPerPage: (value: number) => void;
+    perPage: number;
+    tableData: TableDataType
 }
 
-const Table: React.FC<TableProps> = ({ columns, data }) => {
+const Table: React.FC<TableProps> = ({ columns, tableData, setCurrentPage: setPage, setPerPage, perPage }) => {
+    const { data, meta } = tableData
+    const [currentPage, setCurrentPage] = useState(meta?.currentPage)
+    // console.log(currentPage);
+
+
     const tableInstance = useReactTable({
         columns,
         data,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        // debugColumns: true,
+        // debugHeaders: true,
+        // debugTable: true,
+        // enableColumnFilters: true,
+        // enableColumnResizing: true,
+        // enableMultiSort: false,
+        manualPagination: true,
+        // manualSorting: true,
+        autoResetPageIndex: true,
+        columnResizeMode: 'onChange',
+        state: {
+            pagination: {
+                pageIndex: currentPage - 1,
+                pageSize: perPage,
+            },
+        },
     });
+
+    console.log("data", data);
 
     const {
         getHeaderGroups,
         getRowModel,
         getState,
-        nextPage,
-        previousPage,
-        setPageIndex,
-        setPageSize,
     } = tableInstance;
 
     const { pageIndex, pageSize } = getState().pagination;
+    // console.log(meta);
 
+    const handlePageChange = (page: number) => {
+        // console.log(page);
+        setPage(page)
+        setCurrentPage(page);
+        window.scrollTo(0, 0);
+
+    };
+    if (data.length == 0) {
+        return (
+            <div className="flex justify-center items-center mt-8">
+                <h1>NO DATA</h1>
+            </div>
+        )
+    }
     return (
         <div className="p-4">
             <table className="min-w-full divide-y divide-gray-200">
@@ -74,43 +119,17 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
                 </tbody>
             </table>
             <div className="flex justify-between items-center mt-4">
-                {/* <div>
-                    <button 
-                        className="px-3 py-1 border rounded-md" 
-                        onClick={() => previousPage()} 
-                        disabled={!tableInstance.getCanPreviousPage()}
-                    >
-                        Previous
-                    </button>
-                    <button 
-                        className="px-3 py-1 border rounded-md ml-2" 
-                        onClick={() => nextPage()} 
-                        disabled={!tableInstance.getCanNextPage()}
-                    >
-                        Next
-                    </button>
-                </div> */}
-                {/* <div>
-                    <span>
-                        Page{' '}
-                        <strong>
-                            {pageIndex + 1} of {tableInstance.getPageCount()}
-                        </strong>
-                    </span>
-                    <select
-                        value={pageSize}
-                        onChange={e => setPageSize(Number(e.target.value))}
-                        className="ml-2 border rounded-md"
-                    >
-                        {[10, 20, 30, 40, 50].map(size => (
-                            <option key={size} value={size}>
-                                Show {size}
-                            </option>
-                        ))}
-                    </select>
-                </div> */}
-
-              
+                <Pagination
+                    totalPage={meta.totalPage}
+                    currentPage={currentPage}
+                    perPage={perPage}
+                    setPerPage={setPerPage}
+                    onPageChange={handlePageChange}
+                    setPage={setPage}
+                />
+                {/* <span className="text-sm text-gray-500">
+                    Showing {pageIndex * pageSize + 1} - {Math.min((pageIndex + 1) * pageSize, meta.totalItems)} of {meta.totalItems} results
+                </span> */}
             </div>
         </div>
     );

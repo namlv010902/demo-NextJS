@@ -1,37 +1,44 @@
 "use client";
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import AuthForm from '../components/AuthForm'
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { IFormAuth, schemaAuth } from '@/app/types/auth';
+import { FormLoginType, schemaLogin } from '@/app/types/auth';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { login } from '@/app/api/auth';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/app/context/useContext';
+import { useAuth } from '@/app/context/useContext';
+import { toast } from 'react-toastify';
 
 const LoginPage = () => {
-    const { register, handleSubmit, formState: { errors }, control, setError } = useForm<IFormAuth>({
+    const { register, handleSubmit, formState: { errors }, control, setError } = useForm<FormLoginType | any>({
         defaultValues: {
             email: "",
-            password: ""
+            password: "",
         },
-        resolver: yupResolver(schemaAuth),
+        resolver: yupResolver(schemaLogin),
     });
-    const { loginUser } = useUser();
-
+    const { login: loginProvider } = useAuth();
+    const [loading, setLoading] = useState(false)
     const router = useRouter()
-    const onSubmit: SubmitHandler<IFormAuth> = async data => {
+    const { user } = useAuth()
+    useEffect(() => {
+        if (user) {
+            router.push("/")
+        }
+    }, [user])
+    const onSubmit: SubmitHandler<FormLoginType> = async data => {
+        setLoading(true)
         console.log('Form Data:', data);
         await login(data).then((response) => {
-            // document.cookie = `accessToken=${response.data.accessToken}; Path=/; Max-Age=${24 * 60 * 60 * 1000};`;
-            // document.cookie = `refreshToken=${response.data.refreshToken}; Path=/; Max-Age=${7 * 24 * 60 * 60 * 1000};`;
-            alert("Login Success")
-            router.push("/products")
-            loginUser(response.data.user)
+            toast.success("Login Success")
+            loginProvider(response.data.user)
+            router.push("/")
+            setLoading(false)
         })
             .catch((errors) => {
+                setLoading(false)
                 console.log(errors);
-
                 const { error, message } = errors.response.data
                 if (error.password) {
                     setError("password", {
@@ -46,18 +53,20 @@ const LoginPage = () => {
                     })
                 }
                 if (message)
-                    alert(message)
+                    toast.error(message)
             })
 
     };
     return (
         <div>
-            <h1 >Login</h1>
+            <h1 className='mt-8 text-xl text-center'>Login</h1>
             <AuthForm
                 onSubmit={handleSubmit(onSubmit)}
                 errors={errors}
                 register={register}
                 control={control}
+                btnText='Login'
+                loading={loading}
             />
         </div>
     )

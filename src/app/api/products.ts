@@ -3,26 +3,29 @@ import { instance } from "./instance"
 import { NextRequest, NextResponse } from 'next/server'
 
 
-const getListProducts=()=>{
+const getListProducts=async(query:any)=>{
+    // console.log(query);
     
-    return instance.get("products")
+    const res =await instance.get("posts",{
+        params:query
+    })
+    return res?.data
 }
 const getProduct=async(id:string)=>{
-    const response = await instance.get("products/"+id)
-    return response?.data
+    const response = await instance.get("posts/"+id)
+    return response?.data?.data
 
 }
 const deleteProduct=(id:string)=>{
-    return instance.delete("products/"+id)
+    return instance.delete("posts/"+id)
 }
 const createProduct=(data:Product)=>{
-    return instance.post("products/",data)
+    return instance.post("posts/",data)
 }
 const editProduct=async(data:Product)=>{
     const {id,...dataReq} = data
-    console.log(data);
     
-    const response = await instance.patch("products/"+id,dataReq)
+    const response = await instance.patch("posts/"+id,dataReq)
     return response?.data
 }
 export {

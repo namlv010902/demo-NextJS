@@ -1,10 +1,10 @@
 import { User } from "../types/auth";
 
-type UserContextType = {
+type AuthContextType = {
     user: User | null;
-    loginUser: (userData: User) => void;
-    logoutUser: () => void;
+    login: (userData: User) => void;
+    logout: () => void;
 }
  export type{
-    UserContextType
+    AuthContextType
  }

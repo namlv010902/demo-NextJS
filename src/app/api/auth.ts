@@ -5,9 +5,11 @@ const login = async (data: IFormAuth) => {
     const res = await instance.post("auth/login", data);
     return res?.data;
 };
-
+const signUp = async (data: IFormAuth) => {
+    const res = await instance.post("auth/register", data);
+    return res?.data;
+};
 const getMe = async () => {
-
     const res = await instance.get("auth/me")
     return res?.data;
 };
@@ -19,5 +21,6 @@ const logout = async () => {
 export {
     login,
     getMe,
-    logout
+    logout,
+    signUp
 };

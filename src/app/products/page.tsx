@@ -1,30 +1,36 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Toolbar from '../components/Toolbar/Toolbar';
 import ProductList from './ProductList';
 import { ColumnsToolbar } from '../components/Toolbar/type';
-import { useUser } from '../context/useContext';
+import { useAuth } from '../context';
+import { ROLE } from '@/constant';
+import { useRouter } from 'next/navigation';
 
 
 const Products = () => {
-  const [searchValue, setSearchValue] = useState("")
-  const { user } = useUser();
-  console.log("user", user);
-  
+  const [searchValue, setSearchValue] = useState<string | null>()
+  const { user } = useAuth()
+  const router = useRouter()
+  useEffect(() => {
+    if (user && user?.role != ROLE.ADMIN) {
+      router.push('/403')
 
+    }
+  }, [user])
   const handleSearch = (value: string) => {
     console.log('Search:', value);
     setSearchValue(value);
   };
-  const columns:ColumnsToolbar =
-    {
-      field: 'name',
-      type: 'search',
-      placeholder: '検索',
-      defaultValue: '',
-    }
-  
+  const columns: ColumnsToolbar =
+  {
+    field: 'name',
+    type: 'search',
+    placeholder: '検索',
+    defaultValue: '',
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Toolbar
@@ -33,7 +39,7 @@ const Products = () => {
         createPath="/products/add"
         createBtnText="Add new product"
       />
-      <ProductList/>
+      <ProductList searchValue={searchValue} />
     </div>
   );
 };

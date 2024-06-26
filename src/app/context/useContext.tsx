@@ -1,29 +1,34 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { User } from '../types/auth';
-import { UserContextType } from './type';
+import { AuthContextType } from './type';
+import { logout as logoutApi } from '../api/auth';
+import { useRouter } from 'next/navigation';
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const UserProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-
-  const loginUser = (userData: User) => {
+  const router = useRouter();
+  const login = (userData: User) => {
     setUser(userData);
   };
 
-  const logoutUser = () => {
+  const logout = async () => {
     setUser(null);
+    await logoutApi().then(() => {
+      router.push('/auth/login');
+    })
   };
 
   return (
-    <UserContext.Provider value={{ user, loginUser, logoutUser }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
-    </UserContext.Provider>
+    </AuthContext.Provider>
   );
 };
 
-export const useUser = () => {
-  const context = useContext(UserContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useUser must be used within a UserProvider');
   }

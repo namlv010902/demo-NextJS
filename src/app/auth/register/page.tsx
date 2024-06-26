@@ -3,36 +3,36 @@
 import React from 'react'
 import AuthForm from '../components/AuthForm'
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { IFormAuth, schemaAuth } from '@/app/types/auth';
+import { FormRegisterType,schemaRegister } from '@/app/types/auth';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { login } from '@/app/api/auth';
+import { signUp } from '@/app/api/auth';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 const LoginPage = () => {
-    const { register, handleSubmit, formState: { errors }, control, setError } = useForm<IFormAuth>({
+    const { register, handleSubmit, formState: { errors }, control, setError } = useForm<FormRegisterType | any>({
         defaultValues: {
             email: "",
-            password: ""
-        },
-        resolver: yupResolver(schemaAuth),
-    });
+            password: "",
+            confirmPassword: "",
+            name: "",
+            phoneNumber: ""
 
-    const onSubmit: SubmitHandler<IFormAuth> = async data => {
+        },
+        resolver: yupResolver(schemaRegister),
+    });
+    const router = useRouter()
+    const onSubmit: SubmitHandler<FormRegisterType | any> = async data => {
         console.log('Form Data:', data);
-        await login(data).then((response) => {
-            document.cookie = `accessToken=${response.data.accessToken}; Path=/; Max-Age=${24 * 60 * 60 * 1000};`;
-            document.cookie = `refreshToken=${response.data.refreshToken}; Path=/; Max-Age=${7 * 24 * 60 * 60 * 1000};`;
-            alert("Login Success")
+        await signUp(data).then((response) => {
+            toast.success("Success");
+            router.push("/auth/login")
         })
             .catch((errors) => {
                 console.log(errors);
 
                 const { error, message } = errors.response.data
-                if (error.password) {
-                    setError("password", {
-                        type: "manual",
-                        message: error.password
-                    })
-                }
+      
                 if (error.email) {
                     setError("email", {
                         type: "manual",
@@ -40,18 +40,19 @@ const LoginPage = () => {
                     })
                 }
                 if (message)
-                    alert(message)
+                    toast.error(message)
             })
 
     };
     return (
         <div>
-            <h1 >Register</h1>
+            <h1 className='mt-8 text-xl text-center'>Register</h1>
             <AuthForm
                 onSubmit={handleSubmit(onSubmit)}
                 errors={errors}
                 register={register}
                 control={control}
+                isNoLogin
             />
         </div>
     )
